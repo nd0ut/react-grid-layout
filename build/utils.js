@@ -381,9 +381,12 @@ function sortLayoutItemsByRowCol(layout /*: Layout*/) /*: Layout*/ {
  * @param  {Array}  initialLayout Layout passed in through props.
  * @param  {String} breakpoint    Current responsive breakpoint.
  * @param  {Boolean} verticalCompact Whether or not to compact the layout vertically.
+ * @param  {Function} compactItemFn A function that actually compact the items.
  * @return {Array}                Working layout.
  */
 function synchronizeLayoutWithChildren(initialLayout /*: Layout*/, children /*: Array<React.Element>|React.Element*/, cols /*: number*/, verticalCompact /*: boolean*/) /*: Layout*/ {
+  var compactItemFn /*: Function*/ = arguments.length <= 4 || arguments[4] === undefined ? compactItem : arguments[4];
+
   // ensure 'children' is always an array
   if (!Array.isArray(children)) {
     children = [children];
@@ -426,7 +429,7 @@ function synchronizeLayoutWithChildren(initialLayout /*: Layout*/, children /*: 
 
   // Correct the layout.
   layout = correctBounds(layout, { cols: cols });
-  layout = compact(layout, verticalCompact);
+  layout = compact(layout, verticalCompact, compactItemFn);
 
   return layout;
 }
