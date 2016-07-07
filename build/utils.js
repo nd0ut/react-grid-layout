@@ -402,7 +402,7 @@ function synchronizeLayoutWithChildren(initialLayout /*: Layout*/, children /*: 
     // Don't overwrite if it already exists.
     var exists = getLayoutItem(initialLayout, child.key || "1" /* FIXME satisfies Flow */);
     if (exists) {
-      newItem = exists;
+      newItem = cloneLayoutItem(exists);
     } else {
       var g = child.props._grid;
 

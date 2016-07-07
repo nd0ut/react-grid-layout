@@ -40,6 +40,7 @@ var noop = function noop() {};
 /*:: type State = {
   activeDrag: ?LayoutItem,
   layout: Layout,
+  mounted: boolean,
   oldDragItem: ?LayoutItem,
   oldResizeItem: ?LayoutItem
 };*/
@@ -61,6 +62,7 @@ var ReactGridLayout = function (_React$Component) {
   }
 
   ReactGridLayout.prototype.componentDidMount = function componentDidMount() {
+    this.setState({ mounted: true });
     // Call back with layout on mount. This should be done after correcting the layout width
     // to ensure we don't rerender with the wrong width.
     this.props.onLayoutChange(this.state.layout);
@@ -82,7 +84,7 @@ var ReactGridLayout = function (_React$Component) {
 
     // We need to regenerate the layout.
     if (newLayoutBase) {
-      var newLayout = (0, _utils.synchronizeLayoutWithChildren)(newLayoutBase, nextProps.children, nextProps.cols, nextProps.verticalCompact, this.props.compactItem);
+      var newLayout = (0, _utils.synchronizeLayoutWithChildren)(newLayoutBase, nextProps.children, nextProps.cols, nextProps.verticalCompact, nextProps.compactItem);
       this.setState({ layout: newLayout });
       this.props.onLayoutChange(newLayout);
     }
@@ -313,13 +315,12 @@ var ReactGridLayout = function (_React$Component) {
     var useCSSTransforms = _props2.useCSSTransforms;
     var draggableCancel = _props2.draggableCancel;
     var draggableHandle = _props2.draggableHandle;
+    var mounted = this.state.mounted;
 
     // Parse 'static'. Any properties defined directly on the grid item will take precedence.
 
     var draggable = Boolean(!l.static && isDraggable && (l.isDraggable || l.isDraggable == null));
     var resizable = Boolean(!l.static && isResizable && (l.isResizable || l.isResizable == null));
-    // $FlowIgnore
-    var isBrowser = Boolean(process.browser);
 
     return _react2.default.createElement(
       _GridItem2.default,
@@ -339,8 +340,8 @@ var ReactGridLayout = function (_React$Component) {
         onResizeStop: this.onResizeStop,
         isDraggable: draggable,
         isResizable: resizable,
-        useCSSTransforms: useCSSTransforms && isBrowser,
-        usePercentages: !isBrowser,
+        useCSSTransforms: useCSSTransforms && mounted,
+        usePercentages: !mounted,
 
         w: l.w,
         h: l.h,
@@ -506,6 +507,7 @@ var _initialiseProps = function _initialiseProps() {
   this.state = {
     activeDrag: null,
     layout: (0, _utils.synchronizeLayoutWithChildren)(this.props.layout, this.props.children, this.props.cols, this.props.verticalCompact, this.props.compactItem),
+    mounted: false,
     oldDragItem: null,
     oldResizeItem: null
   };
