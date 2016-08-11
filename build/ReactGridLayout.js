@@ -98,7 +98,9 @@ var ReactGridLayout = function (_React$Component) {
 
   ReactGridLayout.prototype.containerHeight = function containerHeight() {
     if (!this.props.autoSize) return;
-    return (0, _utils.bottom)(this.state.layout) * (this.props.rowHeight + this.props.margin[1]) + this.props.margin[1] + 'px';
+    var nbRow = (0, _utils.bottom)(this.state.layout);
+    var containerPaddingY = this.props.containerPadding ? this.props.containerPadding[1] : this.props.margin[1];
+    return nbRow * this.props.rowHeight + (nbRow - 1) * this.props.margin[1] + containerPaddingY * 2 + 'px';
   };
 
   /**
@@ -266,6 +268,7 @@ var ReactGridLayout = function (_React$Component) {
     var width = _props.width;
     var cols = _props.cols;
     var margin = _props.margin;
+    var containerPadding = _props.containerPadding;
     var rowHeight = _props.rowHeight;
     var maxRows = _props.maxRows;
     var useCSSTransforms = _props.useCSSTransforms;
@@ -284,6 +287,7 @@ var ReactGridLayout = function (_React$Component) {
         containerWidth: width,
         cols: cols,
         margin: margin,
+        containerPadding: containerPadding || margin,
         maxRows: maxRows,
         rowHeight: rowHeight,
         isDraggable: false,
@@ -300,7 +304,7 @@ var ReactGridLayout = function (_React$Component) {
    */
 
 
-  ReactGridLayout.prototype.processGridItem = function processGridItem(child /*: React.Element*/) {
+  ReactGridLayout.prototype.processGridItem = function processGridItem(child /*: React.Element<any>*/) {
     if (!child.key) return;
     var l = (0, _utils.getLayoutItem)(this.state.layout, child.key);
     if (!l) return null;
@@ -308,6 +312,7 @@ var ReactGridLayout = function (_React$Component) {
     var width = _props2.width;
     var cols = _props2.cols;
     var margin = _props2.margin;
+    var containerPadding = _props2.containerPadding;
     var rowHeight = _props2.rowHeight;
     var maxRows = _props2.maxRows;
     var isDraggable = _props2.isDraggable;
@@ -328,6 +333,7 @@ var ReactGridLayout = function (_React$Component) {
         containerWidth: width,
         cols: cols,
         margin: margin,
+        containerPadding: containerPadding || margin,
         maxRows: maxRows,
         rowHeight: rowHeight,
         cancel: draggableCancel,
@@ -414,7 +420,7 @@ ReactGridLayout.propTypes = {
   // {x: Number, y: Number, w: Number, h: Number, i: String}
   layout: function layout(props) {
     var layout = props.layout;
-    // I hope you're setting the _grid property on the grid items
+    // I hope you're setting the data-grid property on the grid items
     if (layout === undefined) return;
     (0, _utils.validateLayout)(layout, 'layout');
   },
@@ -425,6 +431,8 @@ ReactGridLayout.propTypes = {
 
   // Margin between items [x, y] in px
   margin: _react.PropTypes.arrayOf(_react.PropTypes.number),
+  // Padding inside the container [x, y] in px
+  containerPadding: _react.PropTypes.arrayOf(_react.PropTypes.number),
   // Rows have a static height, but you can change this based on breakpoints if you like
   rowHeight: _react.PropTypes.number,
   // Default Infinity, but you can specify a max here if you like.

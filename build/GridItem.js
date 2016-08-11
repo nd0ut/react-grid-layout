@@ -58,10 +58,11 @@ var GridItem = function (_React$Component) {
   GridItem.prototype.calcColWidth = function calcColWidth() {
     var _props = this.props;
     var margin = _props.margin;
+    var containerPadding = _props.containerPadding;
     var containerWidth = _props.containerWidth;
     var cols = _props.cols;
 
-    return (containerWidth - margin[0] * (cols + 1)) / cols;
+    return (containerWidth - margin[0] * (cols - 1) - containerPadding[0] * 2) / cols;
   };
 
   /**
@@ -78,13 +79,14 @@ var GridItem = function (_React$Component) {
   GridItem.prototype.calcPosition = function calcPosition(x /*: number*/, y /*: number*/, w /*: number*/, h /*: number*/, state /*: ?Object*/) {
     var _props2 = this.props;
     var margin = _props2.margin;
+    var containerPadding = _props2.containerPadding;
     var rowHeight = _props2.rowHeight;
 
     var colWidth = this.calcColWidth();
 
     var out = {
-      left: Math.round(colWidth * x + (x + 1) * margin[0]),
-      top: Math.round(rowHeight * y + (y + 1) * margin[1]),
+      left: Math.round((colWidth + margin[0]) * x + containerPadding[0]),
+      top: Math.round((rowHeight + margin[1]) * y + containerPadding[1]),
       // 0 * Infinity === NaN, which causes problems with resize constriants;
       // Fix this if it occurs.
       // Note we do it here rather than later because Math.round(Infinity) causes deopt
@@ -219,7 +221,7 @@ var GridItem = function (_React$Component) {
    */
 
 
-  GridItem.prototype.mixinDraggable = function mixinDraggable(child /*: React.Element*/) {
+  GridItem.prototype.mixinDraggable = function mixinDraggable(child /*: React.Element<any>*/) {
     return _react2.default.createElement(
       _reactDraggable.DraggableCore,
       {
@@ -240,7 +242,7 @@ var GridItem = function (_React$Component) {
    */
 
 
-  GridItem.prototype.mixinResizable = function mixinResizable(child /*: React.Element*/, position /*: Position*/) {
+  GridItem.prototype.mixinResizable = function mixinResizable(child /*: React.Element<any>*/, position /*: Position*/) {
     var _props6 = this.props;
     var cols = _props6.cols;
     var x = _props6.x;
@@ -425,6 +427,7 @@ GridItem.propTypes = {
   rowHeight: _react.PropTypes.number.isRequired,
   margin: _react.PropTypes.array.isRequired,
   maxRows: _react.PropTypes.number.isRequired,
+  containerPadding: _react.PropTypes.array.isRequired,
 
   // These are all in grid units
   x: _react.PropTypes.number.isRequired,
@@ -433,24 +436,27 @@ GridItem.propTypes = {
   h: _react.PropTypes.number.isRequired,
 
   // All optional
-  minW: function minW(props, propName, componentName, location, propFullName) {
-    _react.PropTypes.number(props, propName, componentName, location, propFullName);
+  minW: function minW(props, propName, componentName) {
     var value = props[propName];
-    if (value > props.w || value > props.maxW) return new Error('minWidth bigger than item width/maxWidth');
+    if (typeof value !== 'number') return new Error('minWidth not Number');
+    if (value > props.w || value > props.maxW) return new Error('minWidth larger than item width/maxWidth');
   },
-  maxW: function maxW(props, propName, componentName, location, propFullName) {
-    _react.PropTypes.number(props, propName, componentName, location, propFullName);
+
+  maxW: function maxW(props, propName, componentName) {
     var value = props[propName];
+    if (typeof value !== 'number') return new Error('maxWidth not Number');
     if (value < props.w || value < props.minW) return new Error('maxWidth smaller than item width/minWidth');
   },
-  minH: function minH(props, propName, componentName, location, propFullName) {
-    _react.PropTypes.number(props, propName, componentName, location, propFullName);
+
+  minH: function minH(props, propName, componentName) {
     var value = props[propName];
-    if (value > props.h || value > props.maxH) return new Error('minHeight bigger than item height/maxHeight');
+    if (typeof value !== 'number') return new Error('minHeight not Number');
+    if (value > props.h || value > props.maxH) return new Error('minHeight larger than item height/maxHeight');
   },
-  maxH: function maxH(props, propName, componentName, location, propFullName) {
-    _react.PropTypes.number(props, propName, componentName, location, propFullName);
+
+  maxH: function maxH(props, propName, componentName) {
     var value = props[propName];
+    if (typeof value !== 'number') return new Error('maxHeight not Number');
     if (value < props.h || value < props.minH) return new Error('maxHeight smaller than item height/minHeight');
   },
 

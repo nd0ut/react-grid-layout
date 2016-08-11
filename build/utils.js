@@ -384,7 +384,7 @@ function sortLayoutItemsByRowCol(layout /*: Layout*/) /*: Layout*/ {
  * @param  {Function} compactItemFn A function that actually compact the items.
  * @return {Array}                Working layout.
  */
-function synchronizeLayoutWithChildren(initialLayout /*: Layout*/, children /*: Array<React.Element>|React.Element*/, cols /*: number*/, verticalCompact /*: boolean*/) /*: Layout*/ {
+function synchronizeLayoutWithChildren(initialLayout /*: Layout*/, children /*: Array<React.Element<any>>|React.Element<any>*/, cols /*: number*/, verticalCompact /*: boolean*/) /*: Layout*/ {
   var compactItemFn /*: Function*/ = arguments.length <= 4 || arguments[4] === undefined ? compactItem : arguments[4];
 
   // ensure 'children' is always an array
@@ -404,9 +404,13 @@ function synchronizeLayoutWithChildren(initialLayout /*: Layout*/, children /*: 
     if (exists) {
       newItem = cloneLayoutItem(exists);
     } else {
-      var g = child.props._grid;
+      if (process.env.NODE_ENV !== 'production' && child.props._grid) {
+        console.warn('`_grid` properties on children have been deprecated as of React 15.2. ' + // eslint-disable-line
+        'Please use `data-grid` or add your properties directly to the `layout`.');
+      }
+      var g = child.props['data-grid'] || child.props._grid;
 
-      // Hey, this item has a _grid property, use it.
+      // Hey, this item has a data-grid property, use it.
       if (g) {
         if (!isProduction) {
           validateLayout([g], 'ReactGridLayout.children');
